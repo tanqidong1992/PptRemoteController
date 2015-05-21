@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, PPTClient!</string>
+    <string name="app_name">PPT助手</string>
+    <string name="default_ip">192.168.191.1</string>
+    <string name="default_port">60000</string>
+    <string name="save">保存</string>
+
+</resources>
