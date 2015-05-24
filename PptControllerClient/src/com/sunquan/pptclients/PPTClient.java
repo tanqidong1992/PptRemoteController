@@ -22,6 +22,12 @@ import java.net.UnknownHostException;
 
 
 
+
+
+
+
+
+
 import com.sunquan.pptclients.tools.Mysharepreference;
 import com.sunquan.pptclients.tools.isConnect_Internet;
 import com.tqd.client.TcpClient;
@@ -31,7 +37,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -61,6 +73,9 @@ public class PPTClient extends Activity implements OnClickListener {
 	protected static final int minDistance = 50;
 	protected static final int PEN_MODE = 1;
 	protected static final int NORMAL_MODE = 0;
+	public static final int CONNECTEED = 0;
+	public static final int CONNECTION_FAIL = 1;
+	public static final int BITMAP_RECEIVED =2;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,16 +172,8 @@ public class PPTClient extends Activity implements OnClickListener {
 		}
     	if(v.getId()==R.id.connect&&flag==false){
     		String ret;
-    		flag=connect();
-    		if(flag){
-    			ret=new String("连接成功");
-    			start.setOnClickListener(this);
-    		    mEnterPenMode.setOnClickListener(this);
-    			//back.setOnClickListener(this);
-    		   // forward.setOnClickListener(this);
-    		}
-    		else ret=new String("连接失败");
-    		Toast.makeText(PPTClient.this,ret, Toast.LENGTH_SHORT).show();
+    		connect();
+    		
     		return;
     	}
     	if(flag==false){Toast.makeText(PPTClient.this, "请连接电脑...", Toast.LENGTH_SHORT).show();}
@@ -193,7 +200,7 @@ public class PPTClient extends Activity implements OnClickListener {
 	}
     
     private TcpClient mTcpClient;
-    public  boolean connect()
+    public  void connect()
     {
  
     	com.sunquan.pptclients.tools.Mysharepreference mSharepreference=new Mysharepreference();
@@ -201,9 +208,10 @@ public class PPTClient extends Activity implements OnClickListener {
     	String hostIP=mSharepreference.getMessage(Setting.ip, this);
     	String sPort=mSharepreference.getMessage(Setting.port, this);
 		int port=Integer.parseInt(sPort);
-		mTcpClient=new TcpClient(hostIP, port);
+		mTcpClient=new TcpClient(hostIP, port,mHandler);
+		 
 		//return mTcpClient.isConnected();
-		return true;
+	 
     }
     /**
      * 监听BACK键
@@ -287,6 +295,54 @@ public class PPTClient extends Activity implements OnClickListener {
      
     
     public int mMode=NORMAL_MODE;
-    
+    private Handler mHandler=new Handler(){
+    	
+    	public void handleMessage(android.os.Message msg) {
+    		
+    		if(msg.what==CONNECTEED)
+    		{
+    			Toast.makeText(PPTClient.this, "连接电脑成功", Toast.LENGTH_LONG).show();
+    			flag=true;
+    			Message msg1=new Message();
+    			msg1.setcType(CommandType.CONNECTION_REQUEST);
+    			start.setOnClickListener(PPTClient.this);
+    		    mEnterPenMode.setOnClickListener(PPTClient.this);
+//    			mLinearLayout.getWidth();
+//    			mLinearLayout.getHeight();
+    			
+    			int[] pointX=new int[]{mLinearLayout.getWidth()};
+    			int[] pointY=new int[]{mLinearLayout.getHeight()};
+				msg1.setPointX(pointX);
+    			
+				msg1.setPointY(pointY);
+    			mTcpClient.sendMsgAsync(msg1);
+    		}
+    		if(msg.what==CONNECTION_FAIL)
+    		{
+    			Toast.makeText(PPTClient.this, "连接电脑失败", Toast.LENGTH_LONG).show();
+    		}
+    		
+    		if(msg.what==BITMAP_RECEIVED)
+    		{
+    			
+    			System.out.println("received a png data");
+    			byte[] data=(byte[]) msg.obj;
+    			
+    			Bitmap bitmap=BitmapFactory.decodeByteArray(data, 0, data.length) ;
+				Drawable background=new BitmapDrawable(bitmap);
+				mLinearLayout.setBackground(background);
+    		}
+    		
+//    		if(flag){
+//    			 
+//    			
+//    			//back.setOnClickListener(this);
+//    		   // forward.setOnClickListener(this);
+//    		}
+     
+    		
+    	};
+    	
+    };
 	
 }

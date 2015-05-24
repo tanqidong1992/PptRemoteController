@@ -1,7 +1,10 @@
 package com.tqd.client;
  
 
+import android.os.Handler;
+
 import com.google.gson.Gson;
+import com.sunquan.pptclients.PPTClient;
 import com.tqd.entity.Message;
 
 import io.netty.bootstrap.Bootstrap;
@@ -14,6 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
@@ -27,9 +31,10 @@ public class TcpClient {
 	
 	public   Bootstrap bootstrap;
 	public   Channel channel;
-	
+	Handler mHandler;
 	private Gson mGson;
-	public TcpClient(String hostIP, int port) {
+	public TcpClient(String hostIP, int port,Handler handler) {
+		mHandler=handler;
 		mGson=new Gson();
 		HOST = hostIP;
 		PORT = port;
@@ -40,6 +45,14 @@ public class TcpClient {
 				bootstrap = getBootstrap();
 				channel = getChannel(HOST,PORT);
 				
+				if(isConnected())
+				{
+					mHandler.obtainMessage(PPTClient.CONNECTEED).sendToTarget();
+				}
+				else
+				{
+					mHandler.obtainMessage(PPTClient.CONNECTION_FAIL).sendToTarget();
+				}
 			};
 		}.start();
 
@@ -59,9 +72,9 @@ public class TcpClient {
 				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 				pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-				pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
+				pipeline.addLast("decoder", new ByteArrayDecoder());
 				pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-				pipeline.addLast("handler", new TcpClientHandler());
+				pipeline.addLast("handler", new TcpClientHandler(mHandler));
 			}
 		});
 		b.option(ChannelOption.SO_KEEPALIVE, true);
