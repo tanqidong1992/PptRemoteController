@@ -39,6 +39,7 @@ public class TcpServer {
 				pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
 				pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
 				pipeline.addLast(new TcpServerHandler());
+				
 			}
 		});
 

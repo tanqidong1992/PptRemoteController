@@ -1,14 +1,19 @@
 package com.tqd.server;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.SocketAddress;
+
 import javax.imageio.ImageIO;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
 import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.tqd.core.PPtControlCore;
@@ -16,6 +21,28 @@ import com.tqd.core.PPtControlCore.CommandType;
 import com.tqd.entity.Message;
 public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 		
+	
+		
+		@Override
+	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+		// TODO Auto-generated method stub
+		super.handlerAdded(ctx);
+		
+		SocketAddress sa=	ctx.channel().remoteAddress();
+		
+		ServerDataManager.add(sa, ctx);
+		System.out.println(sa.toString()+" 上线了");
+	}
+
+	@Override
+	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+		// TODO Auto-generated method stub
+		super.handlerRemoved(ctx);
+		SocketAddress sa=	ctx.channel().remoteAddress();
+		ServerDataManager.remove(sa);
+		System.out.println(sa.toString()+" 离开了");
+	}
+
 		private com.tqd.core.PPtControlCore mPPtControlCore;
 		Gson mGson=new Gson();
 
@@ -44,7 +71,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 	    		   ps.start();
 	    	   }
 	    	   else
-	    	   {
+	    	   { 
 	    		   if(mPPtControlCore!=null)
 	    			   
 	    			   mPPtControlCore.processCommand(message.getcType());
@@ -70,19 +97,23 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 	class PictureSender extends Thread
 	{PPtControlCore pcc;
 		ChannelHandlerContext ctx;
+		private boolean canSend=true;
 		PictureSender(ChannelHandlerContext pctx, PPtControlCore ppcc)
 		{
 			ctx=pctx;
 			pcc=ppcc;
 		}
-		
+		public void stopToSend()
+		{
+			canSend=false;
+		}
 		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 				System.out.println("start to send a picture");
 				
-			while(!ctx.isRemoved())
+			while(!ctx.isRemoved() && canSend)
 			{
 				System.out.println(" send a picture");
 				BufferedImage bi=pcc.screenCapture();
@@ -112,7 +143,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 					
 				}
 				try {
-					Thread.sleep(10);
+					Thread.sleep(30);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
