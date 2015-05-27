@@ -23,7 +23,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 		
 	
 		
-		@Override
+	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
 		super.handlerAdded(ctx);
@@ -111,11 +111,11 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-				System.out.println("start to send a picture");
+				//System.out.println("start to send a picture");
 				
 			while(!ctx.isRemoved() && canSend)
 			{
-				System.out.println(" send a picture");
+			//	System.out.println(" send a picture");
 				BufferedImage bi=pcc.screenCapture();
 				ByteBuf bbf=ByteBufAllocator.DEFAULT.buffer();
 				ByteBufOutputStream bb=new ByteBufOutputStream(bbf);

@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 
 
 
+
 import com.sunquan.pptclients.tools.Mysharepreference;
 import com.sunquan.pptclients.tools.isConnect_Internet;
 import com.tqd.client.TcpClient;
@@ -53,6 +54,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -62,7 +64,7 @@ public class PPTClient extends Activity implements OnClickListener {
 	private Button mEnterPenMode;
  
 	private  boolean flag = false;
-	LinearLayout mLinearLayout;
+	ImageView mLinearLayout;
 	private Socket sock;
 	private ObjectOutputStream fromClient;
 	private ObjectInputStream fromServer;
@@ -86,7 +88,7 @@ public class PPTClient extends Activity implements OnClickListener {
         start = (Button)this.findViewById(R.id.start);
         mEnterPenMode = (Button)this.findViewById(R.id.enter_pen_mode);
       
-        mLinearLayout=(LinearLayout) findViewById(R.id.touch_dire);
+        mLinearLayout=(ImageView) findViewById(R.id.touch_dire);
         
         mLinearLayout.setOnTouchListener(new OnTouchListener() {
 			
@@ -120,16 +122,16 @@ public class PPTClient extends Activity implements OnClickListener {
 							if(absDx>absDy)
 							{
 								if(dX>0)
-									msg.setcType(CommandType.MOVE_RIGHT);
+									msg.setcType(CommandType.MOVE_LEFT);
 								else
-									msg.setcType(CommandType.MOVE_LEFT);	
+									msg.setcType(CommandType.MOVE_RIGHT);	
 							}
 							else
 							{
 								if(dY>0)
-									msg.setcType(CommandType.MOVE_DOWN);
+									msg.setcType(CommandType.MOVE_UP);
 								else
-									msg.setcType(CommandType.MOVE_UP);	
+									msg.setcType(CommandType.MOVE_DOWN);	
 							}
 							if(mTcpClient!=null)
 							mTcpClient.sendMsgAsync(msg);
@@ -330,7 +332,8 @@ public class PPTClient extends Activity implements OnClickListener {
     			
     			Bitmap bitmap=BitmapFactory.decodeByteArray(data, 0, data.length) ;
 				Drawable background=new BitmapDrawable(bitmap);
-				mLinearLayout.setBackground(background);
+				mLinearLayout.setImageDrawable(background);
+				//mLinearLayout.setBackground(background);
     		}
     		
 //    		if(flag){
