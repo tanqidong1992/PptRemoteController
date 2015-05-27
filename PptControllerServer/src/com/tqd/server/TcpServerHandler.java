@@ -136,7 +136,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Object> {
 				}
 				if(cf.isSuccess())
 				{
-					System.out.println("send picture success");
+					//System.out.println("send picture success");
 				}
 				else
 				{
