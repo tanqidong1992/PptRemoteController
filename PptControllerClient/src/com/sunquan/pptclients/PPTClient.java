@@ -1,44 +1,13 @@
 package com.sunquan.pptclients;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.sunquan.pptclients.tools.Mysharepreference;
 import com.sunquan.pptclients.tools.isConnect_Internet;
 import com.tqd.client.TcpClient;
 import com.tqd.entity.Message;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -55,19 +24,18 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class PPTClient extends Activity implements OnClickListener {
+	
+	
 	private Button conn;
 	private Button start;
 	private Button mEnterPenMode;
  
 	private  boolean flag = false;
-	ImageView mLinearLayout;
-	private Socket sock;
-	private ObjectOutputStream fromClient;
-	private ObjectInputStream fromServer;
+	ImageView mImageView;
+ 
 	protected int mStartX;
 	protected int mStartY;
 	 
@@ -88,16 +56,17 @@ public class PPTClient extends Activity implements OnClickListener {
         start = (Button)this.findViewById(R.id.start);
         mEnterPenMode = (Button)this.findViewById(R.id.enter_pen_mode);
       
-        mLinearLayout=(ImageView) findViewById(R.id.touch_dire);
+        mImageView=(ImageView) findViewById(R.id.touch_dire);
         
-        mLinearLayout.setOnTouchListener(new OnTouchListener() {
+        mImageView.setOnTouchListener(new OnTouchListener() {
 			
+			@SuppressLint("ClickableViewAccessibility")
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 			
 				
 				
-				int pointCount=event.getPointerCount();
+			 
 				int action=event.getAction();
 				int currentX=(int) event.getX();
 				int currentY=(int) event.getY();
@@ -173,7 +142,7 @@ public class PPTClient extends Activity implements OnClickListener {
 			return;
 		}
     	if(v.getId()==R.id.connect&&flag==false){
-    		String ret;
+    		 
     		connect();
     		
     		return;
@@ -205,14 +174,14 @@ public class PPTClient extends Activity implements OnClickListener {
     public  void connect()
     {
  
-    	com.sunquan.pptclients.tools.Mysharepreference mSharepreference=new Mysharepreference();
+    	 
     	
-    	String hostIP=mSharepreference.getMessage(Setting.ip, this);
-    	String sPort=mSharepreference.getMessage(Setting.port, this);
+    	String hostIP=Mysharepreference.getMessage(Setting.ip, this);
+    	String sPort=Mysharepreference.getMessage(Setting.port, this);
 		int port=Integer.parseInt(sPort);
 		mTcpClient=new TcpClient(hostIP, port,mHandler);
 		 
-		//return mTcpClient.isConnected();
+		 
 	 
     }
     /**
@@ -312,8 +281,8 @@ public class PPTClient extends Activity implements OnClickListener {
 //    			mLinearLayout.getWidth();
 //    			mLinearLayout.getHeight();
     			
-    			int[] pointX=new int[]{mLinearLayout.getWidth()};
-    			int[] pointY=new int[]{mLinearLayout.getHeight()};
+    			int[] pointX=new int[]{mImageView.getWidth()};
+    			int[] pointY=new int[]{mImageView.getHeight()};
 				msg1.setPointX(pointX);
     			
 				msg1.setPointY(pointY);
@@ -327,12 +296,12 @@ public class PPTClient extends Activity implements OnClickListener {
     		if(msg.what==BITMAP_RECEIVED)
     		{
     			
-    			System.out.println("received a png data");
+    			//System.out.println("received a png data");
     			byte[] data=(byte[]) msg.obj;
     			
     			Bitmap bitmap=BitmapFactory.decodeByteArray(data, 0, data.length) ;
 				Drawable background=new BitmapDrawable(bitmap);
-				mLinearLayout.setImageDrawable(background);
+				mImageView.setImageDrawable(background);
 				//mLinearLayout.setBackground(background);
     		}
     		
@@ -347,5 +316,25 @@ public class PPTClient extends Activity implements OnClickListener {
     	};
     	
     };
+    
+    protected void onResume() {
+    	
+    	
+    	super.onResume();
+    };
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+    	// TODO Auto-generated method stub
+    	 
+    	
+    	super.onSaveInstanceState(outState);
+    }
+    
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    	// TODO Auto-generated method stub
+    	super.onRestoreInstanceState(savedInstanceState);
+    }
 	
 }

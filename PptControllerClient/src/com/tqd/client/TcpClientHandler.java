@@ -33,19 +33,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<Object> {
 				
 		}
 		
-//		if(msg instanceof Byte [])
-//		{
-//			mHandler.obtainMessage(PPTClient.BITMAP_RECEIVED, msg).sendToTarget();
-//		}
-//		
-////		if(msg instanceof ByteBuf)
-////		{
-//			ByteBuf bbf=(ByteBuf) msg;
-//			
-//			mHandler.obtainMessage(PPTClient.BITMAP_RECEIVED, bbf.array()).sendToTarget();
-//	//	}
-		 
-		//	System.out.println("client接收到服务器返回的消息:"+msg);
+		
 		
 	}
 
