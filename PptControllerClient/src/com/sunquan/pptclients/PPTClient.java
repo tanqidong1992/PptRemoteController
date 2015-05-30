@@ -179,8 +179,10 @@ public class PPTClient extends Activity implements OnClickListener {
     	String hostIP=Mysharepreference.getMessage(Setting.ip, this);
     	String sPort=Mysharepreference.getMessage(Setting.port, this);
 		int port=Integer.parseInt(sPort);
+		if(mTcpClient==null)
 		mTcpClient=new TcpClient(hostIP, port,mHandler);
-		 
+		else
+			mTcpClient.reconnect(hostIP, port);
 		 
 	 
     }

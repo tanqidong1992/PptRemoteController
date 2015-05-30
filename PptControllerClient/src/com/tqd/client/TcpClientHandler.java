@@ -10,6 +10,7 @@ import android.os.Handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.ReferenceCountUtil;
 
 
 public class TcpClientHandler extends SimpleChannelInboundHandler<Object> {
@@ -55,7 +56,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<Object> {
 		}
 		
 		
-		
+	 	ReferenceCountUtil.release(msg);
 	}
 
    

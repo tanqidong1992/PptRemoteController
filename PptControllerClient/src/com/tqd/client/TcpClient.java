@@ -86,6 +86,7 @@ public class TcpClient {
 		try {
 			channel = bootstrap.connect(host, port).sync().channel();
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.printf("连接Server(IP[%s],PORT[%s])失败", host,port);
 			//logger.error(String.format("连接Server(IP[%s],PORT[%s])失败", host,port),e);
 			return null;
@@ -135,6 +136,36 @@ public class TcpClient {
 		String data=mGson.toJson(msg);
 		
 		sendMsgAsync(data);
+	}
+
+	public void reconnect(String hostIP, int port2) {
+		// TODO Auto-generated method stub
+		
+		if(isConnected()){
+			
+			mHandler.obtainMessage(PPTClient.CONNECTEED).sendToTarget();
+			return ;
+		}
+		new Thread()
+		{
+			public void run() {
+				
+				if(bootstrap==null)
+				bootstrap = getBootstrap();
+				
+				if(channel==null)
+				channel = getChannel(HOST,PORT);
+				
+				if(isConnected())
+				{
+					mHandler.obtainMessage(PPTClient.CONNECTEED).sendToTarget();
+				}
+				else
+				{
+					mHandler.obtainMessage(PPTClient.CONNECTION_FAIL).sendToTarget();
+				}
+			};
+		}.start();
 	}
 
      
