@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 
 public class TcpServer {
 	//private static final Logger logger = Logger.getLogger(TcpServer.class);
-	private static final String IP = "192.168.253.1";
-	private static final int PORT = 9999;
+	private static final String IP = "127.0.0.1";
+	private static final int PORT = 10000;
 	/**用于分配处理业务线程的线程组个数 */
 	protected static final int BIZGROUPSIZE = Runtime.getRuntime().availableProcessors()*2;	//默认
 	/** 业务出现线程大小*/
