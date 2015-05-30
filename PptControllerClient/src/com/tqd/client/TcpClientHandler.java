@@ -1,5 +1,7 @@
 package com.tqd.client;
 
+import java.lang.ref.WeakReference;
+
 import org.apache.log4j.Logger;
 
 import com.sunquan.pptclients.PPTClient;
@@ -12,10 +14,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 public class TcpClientHandler extends SimpleChannelInboundHandler<Object> {
 	//private static final Logger logger = Logger.getLogger(TcpClientHandler.class);
-	Handler mHandler;
+	
+	/**
+	 * 修改Handler为弱引用，当对应Activity已经销毁的时候，这个Handler也会销毁
+	 */
+	WeakReference<Handler> mHandler;
 	public TcpClientHandler(Handler handler) {
 		// TODO Auto-generated constructor stub
-		mHandler=handler;
+		mHandler=new WeakReference<Handler>(handler);
+		
 	}
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Object msg)
@@ -26,8 +33,22 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<Object> {
 		{
 			byte []data=(byte[])msg;
 			if(data.length>1024)
-			mHandler.obtainMessage(PPTClient.BITMAP_RECEIVED, msg).sendToTarget();
-			else
+			{
+				
+				if(mHandler.get()!=null){
+					
+					mHandler.get().obtainMessage(PPTClient.BITMAP_RECEIVED, msg).sendToTarget();
+				}else
+				{
+					//当Handler为null的时候，表示Activity已经销毁了，这个链接应该断开
+					if(!ctx.isRemoved()){
+						ctx.disconnect();
+					}
+					
+				}
+				
+			
+			}else
 				System.out.println(new String(data));
 			
 				
